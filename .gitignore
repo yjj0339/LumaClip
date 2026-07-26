@@ -1,11 +1,9 @@
-﻿## Build output
+## Build output
 [Bb]in/
 [Oo]bj/
-[Dd]ist/
+# dist/ (release artifacts - included in repo)
 [Oo]ut/
 [Bb]uild/
-*.dll
-*.exe
 *.pdb
 *.cache
 
