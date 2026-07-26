@@ -1,0 +1,48 @@
+﻿## Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ist/
+[Oo]ut/
+[Bb]uild/
+*.dll
+*.exe
+*.pdb
+*.cache
+
+## Test artifacts
+[Tt]est[Aa]rtifacts/
+[Tt]est[Rr]esult*/
+*.coverage
+*.coveragexml
+
+## Visual Studio / Rider / VSCode
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.swp
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+## Logs
+*.log
+logs/
+
+## OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+## Secrets
+*.env
+secrets.json
+appsettings.*.Local.json

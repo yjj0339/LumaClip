@@ -1,0 +1,392 @@
+<Window x:Class="LumaClip.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:LumaClip.Models"
+        xmlns:core="clr-namespace:LumaClip.Core"
+        Title="LumaClip" Width="1440" Height="900" MinWidth="1060" MinHeight="680"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource WindowBackground}"
+        Icon="/Assets/LumaClip.ico" UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <Grid ClipToBounds="True">
+    <!-- A real raster material backdrop replaces synthetic color blobs. -->
+    <Image Source="/Assets/GlassBackground.png" Stretch="UniformToFill"
+           Opacity="{DynamicResource BackdropImageOpacity}"
+           RenderOptions.BitmapScalingMode="HighQuality" IsHitTestVisible="False"/>
+    <Border Background="{DynamicResource BackdropTintBrush}" IsHitTestVisible="False"/>
+
+    <Grid Margin="12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="242"/>
+        <ColumnDefinition Width="14"/>
+        <ColumnDefinition Width="*" MinWidth="390"/>
+        <ColumnDefinition Width="14"/>
+        <ColumnDefinition Width="404"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- Translucent navigation material. -->
+      <Border Grid.Column="0" Style="{StaticResource GlassSidebar}" Padding="12">
+        <DockPanel LastChildFill="True">
+          <StackPanel DockPanel.Dock="Top">
+            <Grid Margin="8,6,8,22">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="44"/><ColumnDefinition/></Grid.ColumnDefinitions>
+              <Border Width="42" Height="42" CornerRadius="13" Background="{DynamicResource AccentBrush}" Padding="4"
+                      Effect="{StaticResource SoftShadow}">
+                <Image Source="/Assets/LumaClip-ui.png" Stretch="Uniform"/>
+              </Border>
+              <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="LumaClip" FontWeight="SemiBold" FontSize="17"/>
+                <TextBlock Text="private by design" Style="{StaticResource Caption}" FontSize="10"/>
+              </StackPanel>
+            </Grid>
+
+            <Button x:Name="AllNav" Style="{StaticResource NavButton}" Tag="all" Click="Nav_Click"
+                    Background="{DynamicResource SelectedBrush}">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="&#xE823;" Style="{StaticResource NavGlyph}"/>
+                <TextBlock Grid.Column="1" Text="最近复制" VerticalAlignment="Center"/>
+                <Border Grid.Column="2" Style="{StaticResource CountBadge}">
+                  <TextBlock Text="{Binding ItemCount}" FontSize="10" Foreground="{DynamicResource AccentBrush}"/>
+                </Border>
+              </Grid>
+            </Button>
+            <Button x:Name="AllRecordsNav" Style="{StaticResource NavButton}" Tag="all" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8A5;" Style="{StaticResource NavGlyph}"/><TextBlock Text="全部记录" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="FavoriteNav" Style="{StaticResource NavButton}" Tag="favorite" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE734;" Style="{StaticResource NavGlyph}"/><TextBlock Text="收藏" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="PinnedNav" Style="{StaticResource NavButton}" Tag="pinned" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE718;" Style="{StaticResource NavGlyph}"/><TextBlock Text="置顶" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="TextNav" Style="{StaticResource NavButton}" Tag="text" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8D2;" Style="{StaticResource NavGlyph}"/><TextBlock Text="文本与代码" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="ImageNav" Style="{StaticResource NavButton}" Tag="image" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xEB9F;" Style="{StaticResource NavGlyph}"/><TextBlock Text="图片与截图" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="LinkNav" Style="{StaticResource NavButton}" Tag="link" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE71B;" Style="{StaticResource NavGlyph}"/><TextBlock Text="链接" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button x:Name="FilesNav" Style="{StaticResource NavButton}" Tag="files" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8B7;" Style="{StaticResource NavGlyph}"/><TextBlock Text="文件与文件夹" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+
+            <Border Height="1" Background="{DynamicResource SeparatorBrush}" Margin="10,14,10,10"/>
+            <TextBlock Text="整理" Style="{StaticResource SectionTitle}" Margin="11,2,0,6"/>
+            <Button x:Name="TrashNav" Style="{StaticResource NavButton}" Tag="trash" Click="Nav_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE74D;" Style="{StaticResource NavGlyph}"/><TextBlock Text="回收站" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+
+            <TextBlock Text="本地保存" Style="{StaticResource SectionTitle}" Margin="11,18,0,6"/>
+            <Border Style="{StaticResource LocalDataBadge}" Margin="2,0">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="28"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                <TextBlock Text="&#xEDA2;" FontFamily="Segoe Fluent Icons" Foreground="{DynamicResource TextSecondary}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="数据库" FontWeight="SemiBold" FontSize="12"/>
+                  <TextBlock Text="本地加密 · 不上传" Style="{StaticResource Caption}" FontSize="9"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </StackPanel>
+
+          <StackPanel DockPanel.Dock="Bottom">
+            <Button Style="{StaticResource NavButton}" Click="Floating_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE7F4;" Style="{StaticResource NavGlyph}"/><TextBlock Text="悬浮窗" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <Button Style="{StaticResource NavButton}" Click="Settings_Click">
+              <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE713;" Style="{StaticResource NavGlyph}"/><TextBlock Text="设置" VerticalAlignment="Center"/></StackPanel>
+            </Button>
+            <StackPanel Orientation="Horizontal" Margin="12,14,8,7">
+              <Ellipse Width="7" Height="7" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/>
+              <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" FontSize="10"
+                         Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" MaxWidth="160"/>
+            </StackPanel>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <!-- Visual clipboard shelf. -->
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="2" Margin="2,0,2,10">
+          <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock Text="今天" FontSize="12" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding ItemCount, StringFormat={}{0} 条}" Style="{StaticResource Caption}" FontSize="10" Margin="8,1,0,0"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Style="{StaticResource IconButton}" Content="&#xE718;" ToolTip="仅显示置顶" Tag="pinned" Click="Nav_Click"/>
+            <Button Style="{StaticResource IconButton}" Content="&#xE72C;" Margin="5,0,0,0" ToolTip="刷新" Click="Refresh_Click"/>
+          </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+          <TextBox x:Name="SearchBox" Style="{StaticResource SearchTextBox}"
+                   Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                   Padding="42,12,72,12" ToolTip="搜索正文、标签、备注或来源应用"/>
+          <TextBlock Text="&#xE721;" FontFamily="Segoe Fluent Icons" FontSize="16"
+                     Foreground="{DynamicResource TextSecondary}" IsHitTestVisible="False"
+                     Margin="16,0" VerticalAlignment="Center"/>
+          <TextBlock Text="搜索剪贴板" Foreground="{DynamicResource TextTertiary}" IsHitTestVisible="False"
+                     Margin="43,0,74,0" VerticalAlignment="Center"
+                     Visibility="{Binding Text, ElementName=SearchBox, Converter={StaticResource EmptyStringToVisibility}}"/>
+          <Border HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource KeyBadge}" Margin="0,0,12,0">
+            <TextBlock Text="Ctrl K" FontSize="9" Foreground="{DynamicResource TextSecondary}"/>
+          </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+          <Button x:Name="AllChip" Content="全部" Style="{StaticResource FilterChip}" Tag="all" Click="Nav_Click"
+                  Background="{DynamicResource SelectedBrush}" Foreground="{DynamicResource AccentBrush}"/>
+          <Button x:Name="TextChip" Content="文本" Style="{StaticResource FilterChip}" Tag="text" Click="Nav_Click"/>
+          <Button x:Name="ImageChip" Content="图片" Style="{StaticResource FilterChip}" Tag="image" Click="Nav_Click"/>
+          <Button x:Name="LinkChip" Content="链接" Style="{StaticResource FilterChip}" Tag="link" Click="Nav_Click"/>
+          <Button x:Name="FilesChip" Content="文件" Style="{StaticResource FilterChip}" Tag="files" Click="Nav_Click"/>
+          <Border Width="1" Height="20" Background="{DynamicResource SeparatorBrush}" Margin="6,6,12,6"/>
+          <Button x:Name="FavoriteChip" Content="收藏" Style="{StaticResource FilterChip}" Tag="favorite" Click="Nav_Click"/>
+          <Button x:Name="PinnedChip" Content="置顶" Style="{StaticResource FilterChip}" Tag="pinned" Click="Nav_Click"/>
+        </StackPanel>
+
+        <ListBox x:Name="HistoryList" Grid.Row="3" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" MouseDoubleClick="HistoryList_MouseDoubleClick"
+                 Background="Transparent" BorderThickness="0">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate><WrapPanel IsItemsHost="True"/></ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+              <Setter Property="Width" Value="{Binding ActualWidth, ElementName=HistoryList, Converter={StaticResource ShelfItemWidth}}"/>
+              <Setter Property="Height" Value="188"/>
+              <Setter Property="Margin" Value="0,0,10,10"/>
+              <Setter Property="Padding" Value="0"/>
+              <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+              <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+              <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListBoxItem">
+                    <!--
+                      Keep the visible rim outside the clipping surface. WPF otherwise clips
+                      a one-pixel rounded stroke at fractional DPI coordinates, which caused
+                      the broken blue corners reported by the user.
+                    -->
+                    <Grid x:Name="CardShell" Margin="4,3,4,5" RenderTransformOrigin=".5,.5">
+                      <Grid.RenderTransform>
+                        <TransformGroup>
+                          <ScaleTransform ScaleX="1" ScaleY="1"/>
+                          <TranslateTransform Y="0"/>
+                        </TransformGroup>
+                      </Grid.RenderTransform>
+                      <Border x:Name="Tile"
+                              Background="{DynamicResource TileSurface}"
+                              BorderBrush="{DynamicResource TileBorderBrush}"
+                              BorderThickness="1"
+                              CornerRadius="17"
+                              Padding="1"
+                              SnapsToDevicePixels="True">
+                        <core:RoundedClipBorder x:Name="ContentClip"
+                                                Background="Transparent"
+                                                CornerRadius="15.5"
+                                                ClipToBounds="True"
+                                                RenderTransformOrigin=".5,.5">
+                          <core:RoundedClipBorder.RenderTransform>
+                            <ScaleTransform x:Name="TileScale"/>
+                          </core:RoundedClipBorder.RenderTransform>
+                          <ContentPresenter/>
+                        </core:RoundedClipBorder>
+                      </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Tile" Property="Background" Value="{DynamicResource TileHoverBrush}"/>
+                        <Trigger.EnterActions>
+                          <BeginStoryboard>
+                            <Storyboard>
+                              <DoubleAnimation Storyboard.TargetName="TileScale" Storyboard.TargetProperty="ScaleX" To="1.012" Duration="0:0:0.12"/>
+                              <DoubleAnimation Storyboard.TargetName="TileScale" Storyboard.TargetProperty="ScaleY" To="1.012" Duration="0:0:0.12"/>
+                            </Storyboard>
+                          </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                          <BeginStoryboard>
+                            <Storyboard>
+                              <DoubleAnimation Storyboard.TargetName="TileScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.18"/>
+                              <DoubleAnimation Storyboard.TargetName="TileScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.18"/>
+                            </Storyboard>
+                          </BeginStoryboard>
+                        </Trigger.ExitActions>
+                      </Trigger>
+                      <Trigger Property="IsSelected" Value="True">
+                        <Setter TargetName="CardShell" Property="Effect" Value="{StaticResource SelectedTileShadow}"/>
+                        <Setter TargetName="CardShell" Property="RenderTransform">
+                          <Setter.Value>
+                            <TransformGroup>
+                              <ScaleTransform ScaleX="1.008" ScaleY="1.008"/>
+                              <TranslateTransform Y="-1"/>
+                            </TransformGroup>
+                          </Setter.Value>
+                        </Setter>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type models:ClipboardItem}">
+              <Grid>
+                <Image Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"
+                       Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=Image}">
+                  <Image.Source>
+                    <MultiBinding Converter="{StaticResource ImagePath}" ConverterParameter="720">
+                      <Binding Path="ThumbnailPath" Mode="OneWay"/>
+                      <Binding Path="ContentPath" Mode="OneWay"/>
+                    </MultiBinding>
+                  </Image.Source>
+                </Image>
+                <Border Background="{DynamicResource ImageScrimBrush}"
+                        Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=Image}"/>
+
+                <Grid Margin="15">
+                  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <Border Width="32" Height="32" CornerRadius="10" Background="{DynamicResource AccentSoftBrush}"
+                            Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=!Image}">
+                      <TextBlock Text="{Binding KindGlyph}" FontFamily="Segoe Fluent Icons" Foreground="{DynamicResource AccentBrush}"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Grid.Column="1" Text="{Binding KindLabel}" FontWeight="SemiBold" Margin="10,5,0,0"
+                               Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=!Image}"/>
+                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Width="29" Height="29" Content="{Binding FavoriteGlyph}"
+                            Tag="{Binding}" Click="Favorite_Click" ToolTip="收藏"/>
+                  </Grid>
+                  <TextBlock Grid.Row="1" Text="{Binding DisplayText}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                             MaxHeight="74" Margin="0,12,0,8" LineHeight="20" Foreground="{DynamicResource TextPrimary}"
+                             Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=!Image}"/>
+                  <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding SourceApp}" FontSize="10" Foreground="{DynamicResource TextSecondary}"
+                               TextTrimming="CharacterEllipsis" MaxWidth="190"/>
+                    <TextBlock Grid.Column="1" Text="{Binding TimeLabel}" FontSize="10" Foreground="{DynamicResource TextSecondary}"/>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid Grid.Row="4" Margin="3,4,3,0">
+          <Button Content="清空回收站" HorizontalAlignment="Left" Foreground="{DynamicResource DangerBrush}"
+                  Click="EmptyTrash_Click" Visibility="{Binding IsRecycleBin, Converter={StaticResource BoolToVisibility}}"/>
+          <TextBlock Text="双击记录即可重新复制" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+        </Grid>
+      </Grid>
+
+      <!-- Thick floating inspector glass. -->
+      <Border x:Name="InspectorPanel" Grid.Column="4" Style="{StaticResource GlassInspector}" Padding="18"
+              Effect="{StaticResource InspectorShadow}" RenderTransformOrigin=".5,.5">
+        <Grid>
+          <Grid Visibility="{Binding SelectedItem, Converter={StaticResource NullToVisibilityInverse}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Border Width="70" Height="70" CornerRadius="24" Background="{DynamicResource AccentSoftBrush}">
+                <TextBlock Text="&#xE8A5;" FontFamily="Segoe Fluent Icons" FontSize="26" Foreground="{DynamicResource AccentBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBlock Text="选择一条剪贴内容" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,18,0,0"/>
+              <TextBlock Text="这里会显示完整预览和记录信息" HorizontalAlignment="Center" Style="{StaticResource Caption}" Margin="0,5,0,0"/>
+            </StackPanel>
+          </Grid>
+
+          <Grid DataContext="{Binding SelectedItem}"
+                Visibility="{Binding DataContext.SelectedItem, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource NullToVisibility}}">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid Margin="2,0,2,14">
+              <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="详情" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextTertiary}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                  <TextBlock Text="{Binding KindLabel}" FontSize="22" FontWeight="SemiBold"/>
+                  <Border Background="{DynamicResource AccentSoftBrush}" CornerRadius="8" Padding="8,3" Margin="9,2,0,0">
+                    <TextBlock Text="{Binding TimeLabel}" FontSize="10" Foreground="{DynamicResource AccentBrush}"/>
+                  </Border>
+                </StackPanel>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Style="{StaticResource IconButton}" Content="{Binding PinnedGlyph}" Click="Pin_Click" ToolTip="置顶"/>
+                <Button Style="{StaticResource IconButton}" Content="{Binding FavoriteGlyph}" Margin="4,0,0,0" Click="DetailFavorite_Click" ToolTip="收藏"/>
+                <Button Style="{StaticResource IconButton}" Content="&#xE74D;" Margin="4,0,0,0" Click="Delete_Click" ToolTip="移入回收站/恢复"/>
+              </StackPanel>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,5,0">
+              <StackPanel>
+                <Border Style="{StaticResource PreviewSurface}" Padding="12">
+                  <Grid>
+                    <StackPanel Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=Image}">
+                      <Image Stretch="Uniform" MaxHeight="300" MinHeight="170" RenderOptions.BitmapScalingMode="HighQuality">
+                        <Image.Source>
+                          <MultiBinding Converter="{StaticResource ImagePath}" ConverterParameter="1600">
+                            <Binding Path="ContentPath" Mode="OneWay"/>
+                            <Binding Path="ThumbnailPath" Mode="OneWay"/>
+                          </MultiBinding>
+                        </Image.Source>
+                      </Image>
+                      <TextBlock Text="{Binding Text, Mode=OneWay}" Style="{StaticResource Caption}" HorizontalAlignment="Center" Margin="0,9,0,0"/>
+                    </StackPanel>
+                    <TextBox Text="{Binding DisplayText, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
+                             FontFamily="Cascadia Code, Consolas, Segoe UI" FontSize="12.5" BorderThickness="0" Background="Transparent"
+                             MinHeight="150" MaxHeight="300" VerticalScrollBarVisibility="Auto"
+                             Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=!Image}"/>
+                  </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                  <Button Content="显示敏感内容（本次）" Click="Reveal_Click"
+                          Visibility="{Binding IsSensitive, Converter={StaticResource BoolToVisibility}}"/>
+                  <Button Content="放大查看" Margin="8,0,0,0" Click="OpenImage_Click"
+                          Visibility="{Binding Kind, Converter={StaticResource KindEquals}, ConverterParameter=Image}"/>
+                </StackPanel>
+
+                <TextBlock Text="记录信息" Style="{StaticResource SectionTitle}" Margin="2,0,0,7"/>
+                <Border Style="{StaticResource InspectorGroup}" Padding="13">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                    <TextBlock Text="来源应用" Style="{StaticResource Caption}"/><TextBlock Grid.Column="1" Text="{Binding SourceApp}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Row="1" Text="复制次数" Style="{StaticResource Caption}" Margin="0,9,0,0"/><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CopyCount}" Margin="0,9,0,0"/>
+                    <TextBlock Grid.Row="2" Text="首次记录" Style="{StaticResource Caption}" Margin="0,9,0,0"/><TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CreatedAt, StringFormat=yyyy-MM-dd HH:mm:ss}" Margin="0,9,0,0"/>
+                    <TextBlock Grid.Row="3" Text="数据位置" Style="{StaticResource Caption}" Margin="0,9,0,0"/><TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ContentPath, TargetNullValue=数据库}" TextTrimming="CharacterEllipsis" Margin="0,9,0,0"/>
+                  </Grid>
+                </Border>
+
+                <TextBlock Text="标签" Style="{StaticResource SectionTitle}" Margin="2,5,0,7"/>
+                <TextBox Text="{Binding Tags, UpdateSourceTrigger=PropertyChanged}" LostKeyboardFocus="Metadata_LostKeyboardFocus"
+                         ToolTip="使用逗号分隔多个标签"/>
+                <TextBlock Text="备注" Style="{StaticResource SectionTitle}" Margin="2,14,0,7"/>
+                <TextBox Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" MinHeight="72"
+                         TextWrapping="Wrap" VerticalContentAlignment="Top" LostKeyboardFocus="Metadata_LostKeyboardFocus"/>
+              </StackPanel>
+            </ScrollViewer>
+
+            <Grid Grid.Row="2" Margin="0,14,0,0">
+              <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <Button Content="在资源管理器中显示" HorizontalAlignment="Left" Click="ShowInExplorer_Click"/>
+              <Button Grid.Column="1" Content="复制到剪贴板  ↵" Style="{StaticResource PrimaryButton}" Click="Copy_Click"/>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
